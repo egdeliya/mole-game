@@ -40,15 +40,15 @@ body {
     border-radius: 50%;
 
     width: 267px;
+    aspect-ratio: 1/1;
 
     display: flex;
     justify-content: center;
     align-items: center;
-
-    /*margin: 0 5rem;*/
 }
 .mole {
     /*border: 2px solid yellow;*/
-
-
+}
+.hide-img {
+    display: none;
 }
