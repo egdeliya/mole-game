@@ -54,6 +54,11 @@ body {
     display: none;
 }
 
+.gone {
+    display: none;
+}
+
+
 .hungry-mole {
 
 }

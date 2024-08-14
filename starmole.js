@@ -1,5 +1,6 @@
 let moles = [];
 let molesElements = document.getElementsByClassName("mole");
+let wormProgress = document.querySelector(".worm");
 
 let score = 0;
 
@@ -10,19 +11,53 @@ function generateMoles() {
             state: "hungry", // "fed", "hungry", "leaving", "sad", "gone"
             royal: false, // true, false
             timeToUpdate: Date.now(),
-            nextState: function () {
-                switch (this.state) {
-                    case "gone":
-                        return "hungry";
-                    case "hungry":
-                        return "sad"; // or "fed"
-                    case "sad":
-                    case "fed":
-                        return "leaving";
-                    case "leaving":
-                        return "gone";
+            handleClick: function () {
+                if (this.state !== "hungry") {
+                    return;
+                }
+
+                this.state = "fed";
+
+                score++;
+                if (this.royal) {
+                    score++;
+                }
+
+                showWormMeter(score);
+
+                if (score >= 10) {
+                    showWinScreen();
                 }
             },
+            start: function () {
+                this.timeToUpdate = Date.now();
+                this.state = "hungry";
+                let local = this;
+
+                function nextState() {
+                    if (Date.now() > local.timeToUpdate) {
+                        if (local.state === "gone") { // if (this.state === "gone")
+                            let showRoyal = Math.random() > 0.9;
+
+                            if (showRoyal) {
+                                local.html.src = "./img/king-mole-hungry.png";
+                                local.royal = true;
+                            } else {
+                                local.html.src = "./img/mole-hungry.png";
+                            }
+
+                            local.html.classList.remove("gone");
+                            local.state = "hungry";
+                        } else { // if (this.state === "hungry")
+                            local.html.classList.add("gone");
+                            local.state = "gone";
+                        }
+                        local.timeToUpdate = Date.now() + Math.random() * 2000;
+                    }
+                    requestAnimationFrame(nextState);
+                }
+                requestAnimationFrame(nextState);
+            }
         };
 
         moles.push(mole);
@@ -61,8 +96,6 @@ function showWinScreen() {
     winScreen.classList.remove("hide");
 }
 
-let wormProgress = document.querySelector(".worm");
-
 function showWormMeter(score) {
     let visiblePart = score * 10;
 
@@ -74,22 +107,12 @@ function showWormMeter(score) {
 
 function init() {
     generateMoles();
-    toggleMoles();
 
     moles.forEach(mole => {
+        mole.start();
+
         mole.html.addEventListener('click', function () {
-            if (mole.state !== "hungry") {
-                return;
-            }
-
-            mole.state = "fed";
-            score++;
-
-            showWormMeter(score);
-
-            if (score >= 10) {
-                showWinScreen();
-            }
+            mole.handleClick();
         })
     });
 }
