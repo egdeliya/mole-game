@@ -37,11 +37,11 @@ function toggleMoles() {
 
         function toggleMoleDisplay() {
             if (Date.now() > toggleMoleDisplayAt) {
-                if (mole.html.classList.contains("hide-img")) {
-                    mole.html.classList.remove("hide-img");
+                if (mole.html.classList.contains("hide")) {
+                    mole.html.classList.remove("hide");
                     mole.state = "hungry";
                 } else {
-                    mole.html.classList.add("hide-img");
+                    mole.html.classList.add("hide");
                     mole.state = "gone";
                 }
                 toggleMoleDisplayAt = Date.now() + Math.random() * 2000;
@@ -57,17 +57,22 @@ function showWinScreen() {
     let winScreen = document.getElementById("win-screen");
     let background = document.querySelector(".background");
 
-    background.classList.add("hide-img");
-    winScreen.classList.remove("hide-img");
+    background.classList.add("hide");
+    winScreen.classList.remove("hide");
 }
 
+let wormProgress = document.querySelector(".worm");
 
 function showWormMeter(score) {
+    let visiblePart = score * 10;
 
+    wormProgress.style.clipPath = `polygon(0% 0%,
+        ${visiblePart}% 0%,
+        ${visiblePart}% 100%,
+        0% 100%)`;
 }
 
 function init() {
-    showWormMeter(score);
     generateMoles();
     toggleMoles();
 
@@ -77,10 +82,10 @@ function init() {
                 return;
             }
 
-            score++;
-            showWormMeter(score);
-
             mole.state = "fed";
+            score++;
+
+            showWormMeter(score);
 
             if (score >= 10) {
                 showWinScreen();

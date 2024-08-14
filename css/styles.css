@@ -50,10 +50,19 @@ body {
 .mole {
     /*border: 2px solid yellow;*/
 }
-.hide-img {
+.hide {
     display: none;
 }
 
 .hungry-mole {
 
+}
+
+.worm {
+    clip-path: polygon(0% 0%,
+    5% 0%,
+    5% 100%,
+    0% 100%);
+
+    transition: clip-path 1s;
 }
