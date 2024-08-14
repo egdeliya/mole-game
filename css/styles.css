@@ -3,6 +3,7 @@
 }
 body {
     background-color: #C0C86D;
+    text-align: center;
 }
 .background {
     background-image: url("../img/background.png");
@@ -51,4 +52,8 @@ body {
 }
 .hide-img {
     display: none;
+}
+
+.hungry-mole {
+
 }
