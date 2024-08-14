@@ -11,6 +11,7 @@ function generateMoles() {
             state: "hungry", // "fed", "hungry", "leaving", "sad", "gone"
             royal: false, // true, false
             timeToUpdate: Date.now(),
+
             handleClick: function () {
                 if (this.state !== "hungry") {
                     return;
@@ -29,9 +30,8 @@ function generateMoles() {
                     showWinScreen();
                 }
             },
+
             start: function () {
-                this.timeToUpdate = Date.now();
-                this.state = "hungry";
                 let local = this;
 
                 function nextState() {
@@ -56,6 +56,7 @@ function generateMoles() {
                     }
                     requestAnimationFrame(nextState);
                 }
+
                 requestAnimationFrame(nextState);
             }
         };
@@ -64,28 +65,6 @@ function generateMoles() {
     }
 
     return moles;
-}
-
-function toggleMoles() {
-    moles.forEach(mole => {
-        let toggleMoleDisplayAt = Date.now();
-
-        function toggleMoleDisplay() {
-            if (Date.now() > toggleMoleDisplayAt) {
-                if (mole.html.classList.contains("hide")) {
-                    mole.html.classList.remove("hide");
-                    mole.state = "hungry";
-                } else {
-                    mole.html.classList.add("hide");
-                    mole.state = "gone";
-                }
-                toggleMoleDisplayAt = Date.now() + Math.random() * 2000;
-            }
-            requestAnimationFrame(toggleMoleDisplay);
-        }
-
-        requestAnimationFrame(toggleMoleDisplay);
-    })
 }
 
 function showWinScreen() {
