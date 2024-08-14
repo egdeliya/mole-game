@@ -17,6 +17,8 @@ function generateMoles() {
                     return;
                 }
 
+                this.html.classList.remove("hungry-mole");
+
                 this.state = "fed";
 
                 if (this.royal) {
@@ -24,7 +26,7 @@ function generateMoles() {
                     this.html.src = "./img/king-mole-fed.png"
                 } else {
                     score++;
-                    this.html.src = "./img/mole-fed-png"
+                    this.html.src = "./img/mole-fed.png"
                 }
 
                 this.timeToUpdate = Date.now() + Math.random() * 500;
@@ -53,6 +55,7 @@ function generateMoles() {
                                 }
 
                                 local.html.classList.remove("gone");
+                                local.html.classList.add("hungry-mole");
 
                                 local.state = "hungry";
                                 local.timeToUpdate = Date.now() + 2000;
@@ -64,6 +67,8 @@ function generateMoles() {
                                 } else {
                                     local.html.src = "./img/mole-sad.png";
                                 }
+
+                                local.html.classList.remove("hungry-mole");
 
                                 local.state = "sad";
                                 local.timeToUpdate = Date.now() + Math.random() * 500;

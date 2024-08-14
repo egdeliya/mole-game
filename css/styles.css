@@ -4,6 +4,7 @@
 body {
     background-color: #C0C86D;
     text-align: center;
+    cursor: url("../img/cursor.png"), auto;
 }
 .background {
     background-image: url("../img/background.png");
@@ -53,14 +54,11 @@ body {
 .hide {
     display: none;
 }
-
 .gone {
     display: none;
 }
-
-
-.hungry-mole {
-
+.hungry-mole:hover {
+    cursor: url("../img/cursor-worm.png"), auto;
 }
 
 .worm {
