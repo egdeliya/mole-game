@@ -19,10 +19,15 @@ function generateMoles() {
 
                 this.state = "fed";
 
-                score++;
                 if (this.royal) {
+                    score += 2;
+                    this.html.src = "./img/king-mole-fed.png"
+                } else {
                     score++;
+                    this.html.src = "./img/mole-fed-png"
                 }
+
+                this.timeToUpdate = Date.now() + Math.random() * 500;
 
                 showWormMeter(score);
 
@@ -36,23 +41,54 @@ function generateMoles() {
 
                 function nextState() {
                     if (Date.now() > local.timeToUpdate) {
-                        if (local.state === "gone") { // if (this.state === "gone")
-                            let showRoyal = Math.random() > 0.9;
+                        switch (local.state) {
+                            case "gone":
+                                let showRoyal = Math.random() > 0.9;
 
-                            if (showRoyal) {
-                                local.html.src = "./img/king-mole-hungry.png";
-                                local.royal = true;
-                            } else {
-                                local.html.src = "./img/mole-hungry.png";
-                            }
+                                if (showRoyal) {
+                                    local.royal = true;
+                                    local.html.src = "./img/king-mole-hungry.png";
+                                } else {
+                                    local.html.src = "./img/mole-hungry.png";
+                                }
 
-                            local.html.classList.remove("gone");
-                            local.state = "hungry";
-                        } else { // if (this.state === "hungry")
-                            local.html.classList.add("gone");
-                            local.state = "gone";
+                                local.html.classList.remove("gone");
+
+                                local.state = "hungry";
+                                local.timeToUpdate = Date.now() + 2000;
+
+                                break;
+                            case "hungry":
+                                if (local.royal) {
+                                    local.html.src = "./img/king-mole-sad.png";
+                                } else {
+                                    local.html.src = "./img/mole-sad.png";
+                                }
+
+                                local.state = "sad";
+                                local.timeToUpdate = Date.now() + Math.random() * 500;
+
+                                break;
+                            case "sad":
+                            case "fed":
+                                if (local.royal) {
+                                    local.html.src = "./img/king-mole-leaving.png";
+                                } else {
+                                    local.html.src = "./img/mole-leaving.png";
+                                }
+
+                                local.state = "leaving";
+                                local.timeToUpdate = Date.now() + Math.random() * 500;
+
+                                break;
+                            case "leaving":
+                                local.html.classList.add("gone");
+
+                                local.state = "gone";
+                                local.timeToUpdate = Date.now() + (Math.random() * 18000 + 2000);
+
+                                break;
                         }
-                        local.timeToUpdate = Date.now() + Math.random() * 2000;
                     }
                     requestAnimationFrame(nextState);
                 }
