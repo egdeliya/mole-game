@@ -1,111 +1,128 @@
-let moles = [];
 let molesElements = document.getElementsByClassName("mole");
 let wormProgress = document.querySelector(".worm");
 
 let score = 0;
 
 function generateMoles() {
+    let moles = [];
+
     for (let i = 0; i < molesElements.length; i++) {
-        let mole = {
-            html: molesElements[i],
-            state: "hungry", // "fed", "hungry", "leaving", "sad", "gone"
-            royal: false, // true, false
-            timeToUpdate: Date.now(),
-
-            handleClick: function () {
-                if (this.state !== "hungry") {
-                    return;
-                }
-
-                this.html.classList.remove("hungry-mole");
-
-                this.state = "fed";
-
-                if (this.royal) {
-                    score += 2;
-                    this.html.src = "./img/king-mole-fed.png"
-                } else {
-                    score++;
-                    this.html.src = "./img/mole-fed.png"
-                }
-
-                this.timeToUpdate = Date.now() + Math.random() * 500;
-
-                showWormMeter(score);
-
-                if (score >= 10) {
-                    showWinScreen();
-                }
-            },
-
-            start: function () {
-                let local = this;
-
-                function nextState() {
-                    if (Date.now() > local.timeToUpdate) {
-                        switch (local.state) {
-                            case "gone":
-                                let showRoyal = Math.random() > 0.9;
-
-                                if (showRoyal) {
-                                    local.royal = true;
-                                    local.html.src = "./img/king-mole-hungry.png";
-                                } else {
-                                    local.html.src = "./img/mole-hungry.png";
-                                }
-
-                                local.html.classList.remove("gone");
-                                local.html.classList.add("hungry-mole");
-
-                                local.state = "hungry";
-                                local.timeToUpdate = Date.now() + 2000;
-
-                                break;
-                            case "hungry":
-                                if (local.royal) {
-                                    local.html.src = "./img/king-mole-sad.png";
-                                } else {
-                                    local.html.src = "./img/mole-sad.png";
-                                }
-
-                                local.html.classList.remove("hungry-mole");
-
-                                local.state = "sad";
-                                local.timeToUpdate = Date.now() + Math.random() * 500;
-
-                                break;
-                            case "sad":
-                            case "fed":
-                                if (local.royal) {
-                                    local.html.src = "./img/king-mole-leaving.png";
-                                } else {
-                                    local.html.src = "./img/mole-leaving.png";
-                                }
-
-                                local.state = "leaving";
-                                local.timeToUpdate = Date.now() + Math.random() * 500;
-
-                                break;
-                            case "leaving":
-                                local.html.classList.add("gone");
-
-                                local.state = "gone";
-                                local.timeToUpdate = Date.now() + (Math.random() * 18000 + 2000);
-
-                                break;
-                        }
-                    }
-                    requestAnimationFrame(nextState);
-                }
-
-                requestAnimationFrame(nextState);
-            }
-        };
-
+        let mole = initMole(molesElements[i]);
         moles.push(mole);
     }
 
     return moles;
+}
+
+function initMole(moleHTML) {
+    return {
+        html: moleHTML,
+        state: "hungry", // "fed", "hungry", "leaving", "sad", "gone"
+        royal: false, // true, false
+        timeToUpdate: Date.now(),
+
+        handleClick: function () {
+            if (this.state !== "hungry") {
+                return;
+            }
+
+            this.html.classList.remove("hungry-mole");
+
+            this.state = "fed";
+
+            if (this.royal) {
+                score += 2;
+                this.html.src = "./img/king-mole-fed.png"
+            } else {
+                score++;
+                this.html.src = "./img/mole-fed.png"
+            }
+
+            this.timeToUpdate = Date.now() + Math.random() * 500;
+
+            showWormMeter(score);
+
+            if (score >= 10) {
+                showWinScreen();
+            }
+        },
+
+        start: function () {
+            let local = this;
+
+            function nextState() {
+                if (Date.now() > local.timeToUpdate) {
+                    switch (local.state) {
+                        case "gone": // "gone" -> "hungry"
+                            local.handleGone();
+                            break;
+                        case "hungry": // "hungry" -> "sad"; "hungry" -> "fed" in case if user clicks in time
+                            local.handleHungry();
+                            break;
+                        case "sad": // "sad", "fed" -> "leaving"
+                        case "fed":
+                            local.handleFedSad();
+                            break;
+                        case "leaving": // "leaving" -> "gone"
+                            local.handleLeaving();
+                            break;
+                    }
+                }
+                requestAnimationFrame(nextState);
+            }
+
+            requestAnimationFrame(nextState);
+        },
+
+        handleGone: function() {
+            let showRoyal = Math.random() > 0.9; // show royal mole one time out of ten
+
+            if (showRoyal) {
+                this.royal = true;
+                this.html.src = "./img/king-mole-hungry.png";
+            } else {
+                this.html.src = "./img/mole-hungry.png";
+            }
+
+            this.html.classList.remove("gone");
+            this.html.classList.add("hungry-mole");
+
+            this.state = "hungry";
+            this.timeToUpdate = Date.now() + 2000;
+        },
+
+        handleHungry: function () {
+            if (this.royal) {
+                this.html.src = "./img/king-mole-sad.png";
+            } else {
+                this.html.src = "./img/mole-sad.png";
+            }
+
+            this.html.classList.remove("hungry-mole");
+
+            this.state = "sad";
+            this.timeToUpdate = Date.now() + Math.random() * 500;
+        },
+
+        handleFedSad: function () {
+            if (this.royal) {
+                this.html.src = "./img/king-mole-leaving.png";
+            } else {
+                this.html.src = "./img/mole-leaving.png";
+            }
+
+            this.state = "leaving";
+            this.timeToUpdate = Date.now() + Math.random() * 500;
+        },
+
+        handleLeaving: function () {
+            this.html.classList.add("gone");
+
+            this.state = "gone";
+            // mole is gone from 2 seconds to 20 seconds
+            this.timeToUpdate = Date.now() + (Math.random() * 18000 + 2000);
+        },
+    };
 }
 
 function showWinScreen() {
@@ -126,7 +143,7 @@ function showWormMeter(score) {
 }
 
 function init() {
-    generateMoles();
+    let moles = generateMoles();
 
     moles.forEach(mole => {
         mole.start();
