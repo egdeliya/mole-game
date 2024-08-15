@@ -1,22 +1,22 @@
-let molesElements = document.getElementsByClassName("mole");
+let molesNodes = document.getElementsByClassName("mole");
 let wormProgress = document.querySelector(".worm");
 
 let score = 0;
 
-function generateMoles() {
+function initMoles() {
     let moles = [];
 
-    for (let i = 0; i < molesElements.length; i++) {
-        let mole = initMole(molesElements[i]);
+    for (let i = 0; i < molesNodes.length; i++) {
+        let mole = initMole(molesNodes[i]);
         moles.push(mole);
     }
 
     return moles;
 }
 
-function initMole(moleHTML) {
+function initMole(moleNode) {
     return {
-        html: moleHTML,
+        node: moleNode,
         state: "hungry", // "fed", "hungry", "leaving", "sad", "gone"
         royal: false, // true, false
         timeToUpdate: Date.now(),
@@ -26,16 +26,16 @@ function initMole(moleHTML) {
                 return;
             }
 
-            this.html.classList.remove("hungry-mole");
+            this.node.classList.remove("hungry-mole");
 
             this.state = "fed";
 
             if (this.royal) {
                 score += 2;
-                this.html.src = "./img/king-mole-fed.png"
+                this.node.src = "./img/king-mole-fed.png"
             } else {
                 score++;
-                this.html.src = "./img/mole-fed.png"
+                this.node.src = "./img/mole-fed.png"
             }
 
             this.timeToUpdate = Date.now() + Math.random() * 500;
@@ -47,80 +47,82 @@ function initMole(moleHTML) {
             }
         },
 
-        start: function () {
-            let local = this;
+        startGameLoop: function () {
+            let mole = this;
 
             function nextState() {
-                if (Date.now() > local.timeToUpdate) {
-                    switch (local.state) {
-                        case "gone": // "gone" -> "hungry"
-                            local.handleGone();
+                const now = Date.now();
+
+                if (now > mole.timeToUpdate) {
+                    switch (mole.state) {
+                        case "gone":
+                            mole.goToHungry(now);
                             break;
-                        case "hungry": // "hungry" -> "sad"; "hungry" -> "fed" in case if user clicks in time
-                            local.handleHungry();
+                        case "hungry": // "hungry" -> "fed" in case if user clicks in time
+                            mole.goToSad(now);
                             break;
-                        case "sad": // "sad", "fed" -> "leaving"
+                        case "sad":
                         case "fed":
-                            local.handleFedSad();
+                            mole.goToLeaving(now);
                             break;
                         case "leaving": // "leaving" -> "gone"
-                            local.handleLeaving();
+                            mole.goToGone(now);
                             break;
                     }
                 }
                 requestAnimationFrame(nextState);
             }
 
-            requestAnimationFrame(nextState);
+            nextState();
         },
 
-        handleGone: function() {
+        goToHungry: function(now) {
             let showRoyal = Math.random() > 0.9; // show royal mole one time out of ten
 
             if (showRoyal) {
                 this.royal = true;
-                this.html.src = "./img/king-mole-hungry.png";
+                this.node.src = "./img/king-mole-hungry.png";
             } else {
-                this.html.src = "./img/mole-hungry.png";
+                this.node.src = "./img/mole-hungry.png";
             }
 
-            this.html.classList.remove("gone");
-            this.html.classList.add("hungry-mole");
+            this.node.classList.remove("gone");
+            this.node.classList.add("hungry-mole");
 
             this.state = "hungry";
-            this.timeToUpdate = Date.now() + 2000;
+            this.timeToUpdate = now + 2000;
         },
 
-        handleHungry: function () {
+        goToSad: function (now) {
             if (this.royal) {
-                this.html.src = "./img/king-mole-sad.png";
+                this.node.src = "./img/king-mole-sad.png";
             } else {
-                this.html.src = "./img/mole-sad.png";
+                this.node.src = "./img/mole-sad.png";
             }
 
-            this.html.classList.remove("hungry-mole");
+            this.node.classList.remove("hungry-mole");
 
             this.state = "sad";
-            this.timeToUpdate = Date.now() + Math.random() * 500;
+            this.timeToUpdate = now + Math.random() * 500;
         },
 
-        handleFedSad: function () {
+        goToLeaving: function (now) {
             if (this.royal) {
-                this.html.src = "./img/king-mole-leaving.png";
+                this.node.src = "./img/king-mole-leaving.png";
             } else {
-                this.html.src = "./img/mole-leaving.png";
+                this.node.src = "./img/mole-leaving.png";
             }
 
             this.state = "leaving";
-            this.timeToUpdate = Date.now() + Math.random() * 500;
+            this.timeToUpdate = now + Math.random() * 500;
         },
 
-        handleLeaving: function () {
-            this.html.classList.add("gone");
+        goToGone: function (now) {
+            this.node.classList.add("gone");
 
             this.state = "gone";
             // mole is gone from 2 seconds to 20 seconds
-            this.timeToUpdate = Date.now() + (Math.random() * 18000 + 2000);
+            this.timeToUpdate = now + (Math.random() * 18000 + 2000);
         },
     };
 }
@@ -143,12 +145,12 @@ function showWormMeter(score) {
 }
 
 function init() {
-    let moles = generateMoles();
+    let moles = initMoles();
 
     moles.forEach(mole => {
-        mole.start();
+        mole.startGameLoop();
 
-        mole.html.addEventListener('click', function () {
+        mole.node.addEventListener('click', function () {
             mole.handleClick();
         })
     });
