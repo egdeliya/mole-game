@@ -4,3 +4,5 @@ A fun and simple game where players feed moles to earn points. Royal moles appea
 
 ### How to run
 TODO
+
+&copy; Egdeliia Samirova. See [LICENSE](LICENSE) for more details.
